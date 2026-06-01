@@ -1,0 +1,200 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication
+model User {
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  password  String
+  fullName  String
+  role      String  @default("student") // student, seller, admin
+  
+  profileImage String?
+  bio          String?
+  phone        String?
+  address      String?
+  
+  // Seller specific
+  storeName        String?
+  storeDescription String?
+  isSellerApproved Boolean @default(false)
+  sellerRating     Float   @default(0)
+  sellerReviews    Int     @default(0)
+  earnings         Float   @default(0)
+  
+  // Relations
+  productsForSale      Product[]      @relation("seller")
+  ordersAsBuyer        Order[]        @relation("buyer")
+  ordersAsSeller       Order[]        @relation("seller")
+  sentMessages         Message[]      @relation("sender")
+  receivedMessages     Message[]      @relation("receiver")
+  cartItems            CartItem[]
+  reviews              Review[]
+  notifications        Notification[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Product model
+model Product {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String
+  price       Float
+  stock       Int     @default(0)
+  
+  imageUrl    String?
+  category    String  @default("general")
+  
+  rating      Float   @default(0)
+  reviews     Int     @default(0)
+  
+  sellerId    Int
+  seller      User    @relation("seller", fields: [sellerId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  orders      Order[]
+  cartItems   CartItem[]
+  reviews     Review[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Cart item model
+model CartItem {
+  id        Int @id @default(autoincrement())
+  quantity  Int @default(1)
+  
+  userId    Int
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, productId])
+}
+
+// Order model
+model Order {
+  id            Int     @id @default(autoincrement())
+  orderNumber   String  @unique
+  quantity      Int
+  totalAmount   Float
+  adminFee      Float   @default(0) // 4.5% of totalAmount
+  sellerAmount  Float   @default(0) // totalAmount - adminFee
+  
+  orderStatus   String  @default("pending") // pending, confirmed, shipped, delivered, cancelled
+  paymentStatus String  @default("unpaid") // unpaid, paid, refunded
+  
+  buyerId       Int
+  buyer         User    @relation("buyer", fields: [buyerId], references: [id])
+  
+  sellerId      Int
+  seller        User    @relation("seller", fields: [sellerId], references: [id])
+  
+  productId     Int
+  product       Product @relation(fields: [productId], references: [id])
+  
+  // Payment details
+  paymentMethod String? // stripe, mpesa, wallet, credits
+  transactionId String?
+  
+  // Relations
+  reviews       Review?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Review/Rating model
+model Review {
+  id      Int     @id @default(autoincrement())
+  rating  Int     // 1-5 stars
+  comment String?
+  
+  orderId Int     @unique
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  userId  Int
+  user    User    @relation(fields: [userId], references: [id])
+  
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Chat/Message model
+model Message {
+  id        Int     @id @default(autoincrement())
+  content   String
+  
+  senderId  Int
+  sender    User    @relation("sender", fields: [senderId], references: [id])
+  
+  receiverId Int
+  receiver   User   @relation("receiver", fields: [receiverId], references: [id])
+  
+  isRead    Boolean @default(false)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Notification model
+model Notification {
+  id      Int     @id @default(autoincrement())
+  title   String
+  message String
+  type    String  // order, chat, review, payment, announcement
+  
+  userId  Int
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  isRead  Boolean @default(false)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Food Menu model
+model FoodMenu {
+  id          Int     @id @default(autoincrement())
+  foodName    String
+  description String?
+  price       Float
+  available   Boolean @default(true)
+  imageUrl    String?
+  category    String  @default("lunch") // breakfast, lunch, dinner
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Admin Analytics/Logs (for future use)
+model TransactionLog {
+  id            Int     @id @default(autoincrement())
+  type          String  // order, refund, commission, withdrawal
+  amount        Float
+  description   String?
+  
+  orderId       Int?
+  userId        Int?
+  
+  createdAt DateTime @default(now())
+}
