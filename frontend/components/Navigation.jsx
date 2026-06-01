@@ -27,9 +27,9 @@ export default function Navigation() {
           {/* Logo & Branding */}
           <Link 
             href="/" 
-            className="flex items-center gap-3 text-3xl font-bold hover:opacity-80 transition"
+            className="flex items-center gap-3 hover:opacity-80 transition"
           >
-            <span className="text-4xl">🎓</span>
+            <img src="/logo.svg" alt="StrathMart" className="h-12 w-12" />
             <div className="hidden sm:block">
               <div className="text-2xl font-black">StrathMart</div>
               <div className="text-xs opacity-75">Strathmore University</div>

@@ -16,7 +16,8 @@ export default function Home() {
       <section className="bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-500 text-white py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-6xl font-black mb-4 drop-shadow-lg">📦 StrathMart</h1>
+            <img src="/logo.svg" alt="StrathMart Logo" className="w-32 h-32 mx-auto mb-6 drop-shadow-lg" />
+            <h1 className="text-6xl font-black mb-4 drop-shadow-lg">StrathMart</h1>
             <p className="text-2xl font-bold mb-2 drop-shadow-lg">Your Student Marketplace</p>
             <p className="text-lg opacity-90 max-w-2xl mx-auto drop-shadow-lg">
               Buy, sell, and trade with thousands of students. Fast shipping. Safe payments. Real community.
