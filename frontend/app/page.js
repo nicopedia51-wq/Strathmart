@@ -54,7 +54,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-4xl font-black mb-2 drop-shadow-lg">🔥 Today's Hot Deals</h2>
-              <p className="text-lg opacity-90">Limited time offers you won't want to miss</p>
+              <p className="text-lg opacity-90">Limited time offers you won&apos;t want to miss</p>
             </div>
             <Link href="/deals" className="px-6 py-3 bg-white text-red-600 font-bold rounded-lg hover:bg-gray-100 transition shadow-lg">
               View All Deals →
